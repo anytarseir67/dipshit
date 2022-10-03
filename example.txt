@@ -1,0 +1,37 @@
+; hello world
+
+~++++++++`+++++++++?#
+>~++++++++++`+++++?~.++`?+#
+>~++++++++++++++++++`++++++?##
+>~++++++++++`+++++?~.++`?+++++++++++#
+>~+++++++++++`++++?#
+>~++++++++`++++?#
+>~+++++++++++++++++++++++++++++`+++?#
+<<<#>>>
+>~+++++++++++++++++++`++++++?#
+<<<<<#>>>>>
+>~+++++`++++++++++?~.++`?#
+>~+++++++++++`+++?#
+>++++++++++##
+
+
+
+; looping hello world
+
+>~++`[                                          ; load `2` into bank 1 at the current index, start a loop that will run that many times
+
+    >~++++++++`+++++++++?#                      ; load the number 72 into the first cell, print the value of the cell as a character
+    >~++++++++++`+++++?~.++`?+#                 ; load 101 into the second cell, print it as a character
+    >~++++++++++++++++++`++++++?##              ; 108: see previous comments
+    >~++++++++++`+++++?~.++`?+++++++++++#       ; 111
+    >~+++++++++++`++++?#                        ; 44
+    >~++++++++`++++?#                           ; 32
+    >~+++++++++++++++++++++++++++++`+++?#       ; 87
+    <<<#>>>                                     ; move back 3 cells, print the value, move forward 3 cells
+    >~+++++++++++++++++++`++++++?#              ; 114
+    <<<<<#>>>>>                                 ; move back 5 cells, print, move forward 5 cells
+    >~+++++`++++++++++?~.++`?#                  ; 100
+    >~+++++++++++`+++?#                         ; 33
+    >++++++++++#                                ; 10
+
+]                                               ; defines the end of the loop
