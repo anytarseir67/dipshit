@@ -9,9 +9,16 @@ class State:
         self.banks = [_build_array(), _build_array(), _build_array(), _build_array(), _build_array()]
         self.bank_index = 2
         self.cell_index = 0
+        self.copied = None
 
     def __getitem__(self, i):
         return self.banks[self.bank_index][i]
+
+    def copy(self) -> None:
+        self.copied = self.banks[self.bank_index][self.cell_index]
+    
+    def paste(self) -> None:
+        self.banks[self.bank_index][self.cell_index] = self.copied
 
     def inc_bank(self) -> None:
         self.bank_index += 1
@@ -67,8 +74,9 @@ class State:
             f = 0 - b
             self.banks[self.bank_index][i] = f
 
-    def get_arg(self) -> int:
-        return self.banks[1][self.cell_index]
+    def get_arg(self, index: int=0) -> int:
+        index = self.cell_index + index
+        return self.banks[1][index]
 
     def mul_cel(self) -> None:
         m = self.get_arg()

@@ -5,6 +5,14 @@ banks 0 and 1 are `reserved` and should not be used for general storage
 bank 0 : stores argv
 bank 1 : arguments bank, used to define loop lengths, set number to multiply by, number to divide by, etc.
 
+ALL arguments are placed in bank 1
+
+argument locations:
+    0 is the current cell index
+    negatives are "behind" the current cell index, with -1 being the previous cell
+    positives are "infront" of the current cell index, with 1 being the next cell
+
+
 operators:
 
     ` switch to the next bank
@@ -21,8 +29,13 @@ operators:
     ^ calls the entire cell array on the command line (idk why i added this), terminated by `-1`
     * increment the entire current bank
     $ decrement the entire current bank
-    [] code within is run `n` times, where n is the value in the current cell index, in bank 1 (nested loops are not yet supported)
-    ? multiply the current cell by the value of the current cell index in bank 1
+    [] code within is run `n` times, based on the args
+        args:
+            0: number of loops, positive numbers tell the loop to run that many times, 0 tells the loop to run until it is broken out of
+    ? multiply the current cells
+        args:
+            0: number to multiply by
+            
     . zeros the current cell
     " prints the entire cell array to stdout as numbers
     ' prints the current cell to stdout as a number
@@ -30,13 +43,29 @@ operators:
     : paste the copied value into the selected cell (works across banks)
     _ no-op
     ; signifies a comment, terminated with a line break
+    {} code within is only is only run when a given condition evaluates to 'true':
+        args:
+            0: value to compare
+
+            -1: set the cell to check against (must be in the same bank)
+                    a "pointer" to the cell (actually just it's index, but i like calling it a pointer)
+
+            -2: used to set the type of conditional
+                0: equals
+                1: not equals
+                2: greater than (val > cell)
+                3: lesser than (val < cell)
+    & breaks out of the current loop (doesn't work yet)
+        args:
+            0: if value not 0, break out of all nested loops (back to the top level)
+
+    \ creates a "pointer" to the currently selected cell, pointer is put into the clipboard
 
 reserved:
 
-    {} will be used for conditionals
     / will be used for division
 
 TODO:
-conditionals
+fix break not working
 argv in bank 0 (not difficult, just low priority)
 division (not sure how i should handle floats)

@@ -1,14 +1,14 @@
 from .exceptions import UnknownChar, InvalidSyntax
 from typing import List
 
-def find_loops(s):
+def find_match(s, start, end):
     toret = {}
     pstack = []
 
     for i, c in enumerate(s):
-        if c == '[':
+        if c == start:
             pstack.append(i)
-        elif c == ']':
+        elif c == end:
             if len(pstack) == 0:
                 raise InvalidSyntax()
             toret[pstack.pop()] = i
@@ -88,6 +88,16 @@ class Copy(Token):
 class Paste(Token):
     ...
 
+class Conditional(Token):
+    def __init__(self, tokens: List[Token]) -> None:
+        self.tokens = tokens
+
+class Break(Token):
+    ...
+
+class Pointer(Token):
+    ...
+
 class Nop(Token):
     ...
 
@@ -137,7 +147,7 @@ class Tokenizer:
                 case '$':
                     tokens.append(DecrementBank())
                 case '[':
-                    end = find_loops(code[i:])[0]
+                    end = find_match(code[i:], '[', ']')[0]
                     _cloop = code[i+1:i+end]
                     tokens.append(Loop(self.tokenize(_cloop)))
                     self.tokens_to_skip = end
@@ -157,6 +167,15 @@ class Tokenizer:
                     tokens.append(Nop())
                 case ';':
                     self.comment_len = code[i:].index('\n')
+                case '{':
+                    end = find_match(code[i:], '{', '}')[0]
+                    _cloop = code[i+1:i+end]
+                    tokens.append(Conditional(self.tokenize(_cloop)))
+                    self.tokens_to_skip = end
+                case '&':
+                    tokens.append(Break())
+                case '\\':
+                    tokens.append(Pointer())
                 case ' ':
                     continue
                 case '\n':
@@ -164,5 +183,3 @@ class Tokenizer:
                 case _:
                     raise UnknownChar(char)
         return tokens
-
-# Tokenizer().tokenize(">~+++++++++++`+++?#[++[++]+]")
