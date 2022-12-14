@@ -1,7 +1,7 @@
 from .state import State
 from .tokens import Tokenizer, Token
 from .tokens import NextBank, PreviousBank, MoveLeft, MoveRight, Add, Subtract, Origin, PrintCell, ZeroBank, InvertBank, PrintBank, CallBank, IncrementBank, DecrementBank, Loop, Multiply, ZeroCell, PrintCellAsNum, PrintBankAsNums, Copy, Paste, Conditional, Break, Pointer, Nop
-from .exceptions import InvalidSyntax, EmptyClipboard, UnexpectedArgument
+from .exceptions import InvalidSyntax, EmptyClipboard, UnexpectedArgument, CellOutOfBounds, BankOutOfBounds
 from typing import List
 
 class Interpreter:
@@ -20,17 +20,22 @@ class Interpreter:
 
     def loop(self, code: List[Token]):
         for char in code:
-            if self.loop_break > 0:
-                self.loop_break -= 1
-                break
             match char:
                 case NextBank():
+                    if self.state.bank_index == 4:
+                        raise BankOutOfBounds(self.state.bank_index+1)
                     self.state.inc_bank()
                 case PreviousBank():
+                    if self.state.bank_index == 0:
+                        raise BankOutOfBounds(self.state.bank_index-1)
                     self.state.dec_bank()
                 case MoveLeft():
+                    if self.state.cell_index == 0:
+                        raise CellOutOfBounds(self.state.bank_index, self.state.cell_index-1)
                     self.state.move_left()
                 case MoveRight():
+                    if self.state.cell_index + 1 > len(self.state.banks[0]) - 1:
+                        raise CellOutOfBounds(self.state.bank_index, self.state.cell_index+1)
                     self.state.move_right()
                 case Add():
                     self.state.inc()
@@ -59,9 +64,13 @@ class Interpreter:
                         while True:
                             if self.loop_break > 0:
                                 self.loop_break -= 1
+                                break
                             self.loop(char.tokens)
                     elif arg > 0:
-                        for _ in range():
+                        for _ in range(arg):
+                            if self.loop_break > 0:
+                                self.loop_break -= 1
+                                break
                             self.loop(char.tokens)
                     else:
                         raise UnexpectedArgument(arg, self.state.cell_index)
@@ -79,7 +88,10 @@ class Interpreter:
                 case Paste():
                     if self.state.copied == None:
                         raise EmptyClipboard()
-                    self.state.paste()
+                    try:
+                        self.state.paste()
+                    except IndexError:
+                        raise CellOutOfBounds(self.state.bank_index, self.state.cell_index)
                 case Conditional():
                     val = self.state.get_arg()
                     cell = self.state.get_arg(-1)
@@ -100,7 +112,6 @@ class Interpreter:
                     else:
                         raise UnexpectedArgument(_type, self.state.cell_index-2)
                 case Break():
-                    #TODO: doesn't work :|
                     arg = self.state.get_arg()
                     if arg != 0:
                         self.loop_break += self.loop_nest

@@ -7,6 +7,10 @@ def _build_array():
 class State:
     def __init__(self) -> None:
         self.banks = [_build_array(), _build_array(), _build_array(), _build_array(), _build_array()]
+        if len(sys.argv) > 2:
+            for i, char in enumerate(' '.join(sys.argv[1:])):
+                self.banks[0][i] = ord(char)
+            self.banks[0][i+1] = -1
         self.bank_index = 2
         self.cell_index = 0
         self.copied = None
