@@ -1,7 +1,7 @@
 from .exceptions import UnknownChar, InvalidSyntax
 from typing import List
 
-def find_match(s, start, end):
+def find_match(s: str, start: str, end: str):
     toret = {}
     pstack = []
 
@@ -10,11 +10,11 @@ def find_match(s, start, end):
             pstack.append(i)
         elif c == end:
             if len(pstack) == 0:
-                raise InvalidSyntax()
+                return
             toret[pstack.pop()] = i
 
     if len(pstack) > 0:
-        raise InvalidSyntax()
+        return
 
     return toret
 
